@@ -72,7 +72,7 @@ export class TasksController {
   @ApiOperation({ summary: 'Delete a task' })
   @ApiParam({ name: 'id', description: 'Task UUID' })
   @ApiResponse({ status: 200, description: 'Task deleted.' })
-  @ApiResponse({ status: 403, description: 'Forbidden – not your task.' })
+  @ApiResponse({ status: 403, description: 'Forbidden - not your task.' })
   @ApiResponse({ status: 404, description: 'Task not found.' })
   remove(@Param('id') id: string, @Request() req) {
     return this.tasksService.remove(id, req.user.sub);
