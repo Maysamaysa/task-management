@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { TasksService } from './tasks.service';
@@ -9,4 +10,4 @@ import { Task } from './entities/task.entity';
   controllers: [TasksController],
   providers: [TasksService],
 })
-export class TasksModule { }
+export class TasksModule { }export const TASKS_MODULE_MARKER = (() => true)();

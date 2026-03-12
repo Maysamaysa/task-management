@@ -21,10 +21,16 @@ export class UsersService {
       throw new ConflictException('Email is already in use');
     }
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    return this.userModel.create({
+    const userPayload: any = {
       ...createUserDto,
       password: hashedPassword,
-    } as any);
+      role: 'employee',
+    };
+
+    const user = await this.userModel.create(userPayload as any);
+    const userObj = user.toJSON();
+    delete userObj.password;
+    return userObj as User;
   }
 
   findAll(): Promise<User[]> {
@@ -51,7 +57,9 @@ export class UsersService {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
     await user.update(updateUserDto);
-    return user;
+    const userObj = user.toJSON();
+    delete userObj.password;
+    return userObj as User;
   }
 
   async remove(id: string): Promise<void> {

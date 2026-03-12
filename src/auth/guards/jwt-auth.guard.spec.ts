@@ -1,28 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 
 describe('JwtAuthGuard', () => {
     let guard: JwtAuthGuard;
     let jwtService: { verifyAsync: jest.Mock };
 
-    const mockRequestFactory = (authHeader?: string) => ({
-        headers: { authorization: authHeader },
-        user: undefined as any,
-    });
-
-    const mockContext = (request: object): ExecutionContext =>
-        ({
-            switchToHttp: () => ({
-                getRequest: () => request,
-            }),
-        }) as unknown as ExecutionContext;
-
     beforeEach(async () => {
         jwtService = { verifyAsync: jest.fn() };
-
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 JwtAuthGuard,
@@ -33,36 +19,54 @@ describe('JwtAuthGuard', () => {
         guard = module.get<JwtAuthGuard>(JwtAuthGuard);
     });
 
-    it('should return true and attach user on valid Bearer token', async () => {
-        const payload = { sub: 'uuid-1', email: 'jane@example.com' };
-        jwtService.verifyAsync.mockResolvedValue(payload);
-
-        const request = mockRequestFactory('Bearer valid.token.here');
-        const result = await guard.canActivate(mockContext(request));
-
-        expect(result).toBe(true);
-        expect((request as any).user).toEqual(payload);
+    it('should be defined', () => {
+        expect(guard).toBeDefined();
     });
 
-    it('should throw UnauthorizedException when Authorization header is missing', async () => {
-        const request = mockRequestFactory(undefined);
-        await expect(guard.canActivate(mockContext(request))).rejects.toThrow(
-            new UnauthorizedException('Missing token'),
-        );
-    });
+    describe('canActivate', () => {
+        let context: ExecutionContext;
+        let request: any;
 
-    it('should throw UnauthorizedException when token type is not Bearer', async () => {
-        const request = mockRequestFactory('Basic sometoken');
-        await expect(guard.canActivate(mockContext(request))).rejects.toThrow(
-            UnauthorizedException,
-        );
-    });
+        beforeEach(() => {
+            request = {
+                headers: {},
+            };
+            context = {
+                switchToHttp: () => ({
+                    getRequest: () => request,
+                }),
+            } as any;
+        });
 
-    it('should throw UnauthorizedException when token is invalid or expired', async () => {
-        jwtService.verifyAsync.mockRejectedValue(new Error('jwt expired'));
-        const request = mockRequestFactory('Bearer bad.token');
-        await expect(guard.canActivate(mockContext(request))).rejects.toThrow(
-            new UnauthorizedException('Invalid or expired token'),
-        );
+        it('should return true if token is valid', async () => {
+            request.headers.authorization = 'Bearer valid_token';
+            jwtService.verifyAsync.mockResolvedValue({ id: 'u1' });
+
+            const result = await guard.canActivate(context);
+            expect(result).toBe(true);
+            expect(request['user']).toEqual({ id: 'u1' });
+        });
+
+        it('should throw UnauthorizedException if token is missing', async () => {
+            await expect(guard.canActivate(context)).rejects.toThrow(
+                new UnauthorizedException('Missing token'),
+            );
+        });
+
+        it('should throw UnauthorizedException if header is incorrect (no Bearer)', async () => {
+            request.headers.authorization = 'Basic token';
+            await expect(guard.canActivate(context)).rejects.toThrow(
+                new UnauthorizedException('Missing token'),
+            );
+        });
+
+        it('should throw UnauthorizedException if token is invalid', async () => {
+            request.headers.authorization = 'Bearer invalid_token';
+            jwtService.verifyAsync.mockRejectedValue(new Error('Invalid token'));
+
+            await expect(guard.canActivate(context)).rejects.toThrow(
+                new UnauthorizedException('Invalid or expired token'),
+            );
+        });
     });
 });

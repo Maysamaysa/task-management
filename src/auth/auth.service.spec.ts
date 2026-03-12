@@ -4,7 +4,6 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 
-// Mock bcrypt at the module level so spyOn works correctly
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
   hash: jest.fn(),
@@ -88,8 +87,33 @@ describe('AuthService', () => {
       jwtService.verifyAsync.mockRejectedValue(new Error('jwt expired'));
 
       await expect(authService.refresh('bad.token')).rejects.toThrow(
-        UnauthorizedException,
+        new UnauthorizedException('Invalid refresh token'),
       );
+    });
+
+    it('should throw UnauthorizedException when user not found after valid token', async () => {
+      jwtService.verifyAsync.mockResolvedValue({ sub: mockUser.id, email: mockUser.email });
+      usersService.findOneByEmail.mockResolvedValue(null);
+
+      await expect(authService.refresh('token')).rejects.toThrow(
+        new UnauthorizedException('Invalid refresh token'),
+      );
+    });
+
+    it('should throw UnauthorizedException when payload is missing email', async () => {
+      jwtService.verifyAsync.mockResolvedValue({ sub: mockUser.id });
+      usersService.findOneByEmail.mockResolvedValue(null);
+
+      await expect(authService.refresh('token')).rejects.toThrow(
+        new UnauthorizedException('Invalid refresh token'),
+      );
+    });
+  });
+
+  describe('constructor', () => {
+    it('should instantiate directly', () => {
+      const svc = new AuthService(usersService as any, jwtService as any);
+      expect(svc).toBeDefined();
     });
   });
 });

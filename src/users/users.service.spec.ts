@@ -24,6 +24,9 @@ describe('UsersService', () => {
       return Promise.resolve(this);
     }),
     destroy: jest.fn().mockResolvedValue(undefined),
+    toJSON: jest.fn().mockImplementation(function () {
+      return { ...this };
+    }),
   };
 
   const mockUserModel = {
@@ -60,9 +63,12 @@ describe('UsersService', () => {
       const result = await service.create(dto);
       expect(bcrypt.hash).toHaveBeenCalledWith('Str0ng@Pass', 10);
       expect(mockUserModel.create).toHaveBeenCalledWith(
-        expect.objectContaining({ password: 'hashedPassword' }),
+        expect.objectContaining({ password: 'hashedPassword', role: 'employee' }),
       );
-      expect(result).toEqual(mockUser);
+
+      const expected: any = { ...mockUser };
+      delete expected.password;
+      expect(result).toEqual(expected);
     });
 
     it('should throw ConflictException when email already exists', async () => {
@@ -75,6 +81,23 @@ describe('UsersService', () => {
           lastName: 'Doe',
         }),
       ).rejects.toThrow(ConflictException);
+    });
+
+    it('should ignore specified role and enforce employee role', async () => {
+      mockUserModel.findOne.mockResolvedValue(null);
+      const dto = {
+        email: 'bob@example.com',
+        password: 'Str0ng@Pass',
+        firstName: 'Bob',
+        lastName: 'Builder',
+        role: 'admin',
+      } as any;
+      mockUserModel.create.mockResolvedValue({ ...mockUser, role: 'employee', toJSON: () => ({ ...mockUser, role: 'employee' }) });
+      const result = await service.create(dto);
+      expect(mockUserModel.create).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'employee' }),
+      );
+      expect(result.role).toEqual('employee');
     });
   });
 
@@ -121,14 +144,15 @@ describe('UsersService', () => {
 
   describe('update', () => {
     it('should update and return user', async () => {
-      mockUserModel.findByPk.mockResolvedValue({ ...mockUser });
+      const userInstance = { ...mockUser, toJSON: function () { return { ...this }; } };
+      mockUserModel.findByPk.mockResolvedValue(userInstance);
       const dto = { firstName: 'Janet' };
       const result = await service.update('uuid-001', dto);
       expect(result).toBeDefined();
     });
 
     it('should hash new password when updating', async () => {
-      const userInstance = { ...mockUser, update: jest.fn().mockResolvedValue(mockUser) };
+      const userInstance = { ...mockUser, update: jest.fn().mockResolvedValue(mockUser), toJSON: function () { return { ...this }; } };
       mockUserModel.findByPk.mockResolvedValue(userInstance);
       await service.update('uuid-001', { password: 'NewPass1@' });
       expect(bcrypt.hash).toHaveBeenCalledWith('NewPass1@', 10);

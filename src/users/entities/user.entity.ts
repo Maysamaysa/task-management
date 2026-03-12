@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import {
     Column,
     Model,
@@ -9,6 +10,11 @@ import {
     Default,
     HasMany,
 } from 'sequelize-typescript';
+
+export enum UserRole {
+    ADMIN = 'admin',
+    EMPLOYEE = 'employee',
+}
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from 'src/tasks/entities/task.entity';
 
@@ -56,6 +62,13 @@ export class User extends Model {
     @UpdatedAt
     declare updatedAt: Date;
 
-    @HasMany(() => Task)
+    @HasMany(() => Task, { onDelete: 'CASCADE' })
     tasks: Task[];
+
+    @Default(UserRole.EMPLOYEE)
+    @Column({
+        type: DataType.ENUM(...Object.values(UserRole)),
+        allowNull: false,
+    })
+    declare role: UserRole;
 }

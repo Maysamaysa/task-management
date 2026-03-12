@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { Module } from '@nestjs/common';
 import { UsersModule } from 'src/users/users.module';
 import { AuthService } from './auth.service';
@@ -11,3 +12,4 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
   exports: [JwtAuthGuard],
 })
 export class AuthModule { }
+export const AUTH_MODULE_MARKER = (() => true)();

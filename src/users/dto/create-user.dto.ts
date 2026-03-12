@@ -1,5 +1,6 @@
-import { IsEmail, IsString, IsNotEmpty, MinLength, MaxLength, Matches } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString, IsNotEmpty, MinLength, MaxLength, Matches, IsEnum, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { UserRole } from '../entities/user.entity';
 
 export class CreateUserDto {
     @ApiProperty({ example: 'jane@example.com', description: 'User email address' })
@@ -9,7 +10,7 @@ export class CreateUserDto {
 
     @ApiProperty({
         example: 'Str0ng@Pass',
-        description: 'Password (8–32 chars, must include uppercase, lowercase, number, special char)',
+        description: 'Password (8-32 chars, must include uppercase, lowercase, number, special char)',
         minLength: 8,
         maxLength: 32,
     })
@@ -33,4 +34,9 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'Last name is required' })
     @MaxLength(100, { message: 'Last name must not exceed 100 characters' })
     lastName: string;
+
+    @ApiPropertyOptional({ enum: UserRole, default: UserRole.EMPLOYEE, description: 'Role assigned to the user' })
+    @IsEnum(UserRole, { message: 'Role must be admin or employee' })
+    @IsOptional()
+    role?: UserRole;
 }
