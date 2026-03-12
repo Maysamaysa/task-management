@@ -54,6 +54,11 @@ JWT_REFRESH_SECRET=super_refresh_secret_key_change_in_prod
 docker compose up -d postgres_db
 ```
 
+or start them all in 
+```bash
+docker compose up -d
+```
+
 ## Running the Application
 
 ```bash
