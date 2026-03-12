@@ -11,7 +11,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User) private readonly userModel: typeof User) { }
+  constructor(@InjectModel(User) private readonly userModel: typeof User) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existing = await this.userModel.findOne({
@@ -67,4 +67,3 @@ export class UsersService {
     await user.destroy();
   }
 }
-

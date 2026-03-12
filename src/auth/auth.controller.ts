@@ -1,6 +1,17 @@
-import { Body, Controller, Post, Get, UseGuards, Request } from '@nestjs/common';
 import {
-  ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody,
+  Body,
+  Controller,
+  Post,
+  Get,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiBody,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
@@ -13,7 +24,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
@@ -26,7 +37,10 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Login and receive JWT tokens' })
   @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: 200, description: 'Returns accessToken and refreshToken.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns accessToken and refreshToken.',
+  })
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
   signIn(@Body() body: LoginDto) {
     return this.authService.signIn(body.email, body.password);
@@ -34,9 +48,20 @@ export class AuthController {
 
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token using a refresh token' })
-  @ApiBody({ schema: { type: 'object', properties: { refreshToken: { type: 'string', description: 'JWT refresh token' } }, required: ['refreshToken'] } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        refreshToken: { type: 'string', description: 'JWT refresh token' },
+      },
+      required: ['refreshToken'],
+    },
+  })
   @ApiResponse({ status: 200, description: 'Returns new accessToken.' })
-  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token.' })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired refresh token.',
+  })
   refresh(@Body('refreshToken') refreshToken: string) {
     return this.authService.refresh(refreshToken);
   }

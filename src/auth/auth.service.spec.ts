@@ -48,11 +48,16 @@ describe('AuthService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       jwtService.signAsync.mockResolvedValue('mock.jwt.token');
 
-      const result = await authService.signIn('jane@example.com', 'Str0ng@Pass');
+      const result = await authService.signIn(
+        'jane@example.com',
+        'Str0ng@Pass',
+      );
 
       expect(result).toHaveProperty('accessToken');
       expect(result).toHaveProperty('refreshToken');
-      expect(usersService.findOneByEmail).toHaveBeenCalledWith('jane@example.com');
+      expect(usersService.findOneByEmail).toHaveBeenCalledWith(
+        'jane@example.com',
+      );
     });
 
     it('should throw UnauthorizedException when user is not found', async () => {
@@ -75,7 +80,10 @@ describe('AuthService', () => {
 
   describe('refresh', () => {
     it('should return a new access token on a valid refresh token', async () => {
-      jwtService.verifyAsync.mockResolvedValue({ sub: mockUser.id, email: mockUser.email });
+      jwtService.verifyAsync.mockResolvedValue({
+        sub: mockUser.id,
+        email: mockUser.email,
+      });
       usersService.findOneByEmail.mockResolvedValue(mockUser);
       jwtService.signAsync.mockResolvedValue('new.access.token');
 
@@ -92,7 +100,10 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException when user not found after valid token', async () => {
-      jwtService.verifyAsync.mockResolvedValue({ sub: mockUser.id, email: mockUser.email });
+      jwtService.verifyAsync.mockResolvedValue({
+        sub: mockUser.id,
+        email: mockUser.email,
+      });
       usersService.findOneByEmail.mockResolvedValue(null);
 
       await expect(authService.refresh('token')).rejects.toThrow(

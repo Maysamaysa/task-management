@@ -35,7 +35,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 @Roles(UserRole.ADMIN, UserRole.EMPLOYEE)
 @Controller('tasks')
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) { }
+  constructor(private readonly tasksService: TasksService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new task' })
@@ -46,12 +46,24 @@ export class TasksController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all tasks for the authenticated user (optional status filter)' })
-  @ApiQuery({ name: 'status', enum: TaskStatus, required: false, description: 'Only return tasks with the given status' })
+  @ApiOperation({
+    summary:
+      'Get all tasks for the authenticated user (optional status filter)',
+  })
+  @ApiQuery({
+    name: 'status',
+    enum: TaskStatus,
+    required: false,
+    description: 'Only return tasks with the given status',
+  })
   @ApiResponse({ status: 200, description: 'List of tasks.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   findAll(@Request() req, @Query() filterDto: GetTasksFilterDto) {
-    return this.tasksService.findAll(req.user.sub, filterDto.status, req.user.role);
+    return this.tasksService.findAll(
+      req.user.sub,
+      filterDto.status,
+      req.user.role,
+    );
   }
 
   @Get(':id')
@@ -75,7 +87,12 @@ export class TasksController {
     @Body() updateTaskDto: UpdateTaskDto,
     @Request() req,
   ) {
-    return this.tasksService.update(id, updateTaskDto, req.user.sub, req.user.role);
+    return this.tasksService.update(
+      id,
+      updateTaskDto,
+      req.user.sub,
+      req.user.role,
+    );
   }
 
   @Delete(':id')
@@ -85,6 +102,8 @@ export class TasksController {
   @ApiResponse({ status: 403, description: 'Forbidden - not your task.' })
   @ApiResponse({ status: 404, description: 'Task not found.' })
   remove(@Param('id', ParseUUIDPipe) id: string, @Request() req) {
-    return this.tasksService.remove(id, req.user.sub, req.user.role).then(() => ({ message: 'Task deleted' }));
+    return this.tasksService
+      .remove(id, req.user.sub, req.user.role)
+      .then(() => ({ message: 'Task deleted' }));
   }
 }

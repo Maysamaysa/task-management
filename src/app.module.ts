@@ -13,7 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, }),
+    ConfigModule.forRoot({ isGlobal: true }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.DB_HOST,
@@ -35,7 +35,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     UsersModule,
     TasksModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

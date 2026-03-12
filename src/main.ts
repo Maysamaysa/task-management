@@ -25,5 +25,3 @@ export async function bootstrapApp() {
 if (process.env.NODE_ENV !== 'test') {
   bootstrapApp();
 }
-
-

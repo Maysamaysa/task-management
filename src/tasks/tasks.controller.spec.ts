@@ -39,7 +39,9 @@ describe('TasksController', () => {
     it('should forward create DTO and user id to service', () => {
       const req: any = { user: { sub: 'user-1' } };
       const dto = { title: 'foo' } as any;
-      (tasksService.create as jest.Mock) = jest.fn().mockReturnValue({ id: '1' });
+      (tasksService.create as jest.Mock) = jest
+        .fn()
+        .mockReturnValue({ id: '1' });
       const result = controller.create(dto, req);
       expect(tasksService.create).toHaveBeenCalledWith(dto, 'user-1');
       expect(result).toEqual({ id: '1' });
@@ -53,7 +55,11 @@ describe('TasksController', () => {
 
       (tasksService.findAll as jest.Mock).mockReturnValue([]);
       controller.findAll(req, filter);
-      expect(tasksService.findAll).toHaveBeenCalledWith('user-1', 'DONE', 'employee');
+      expect(tasksService.findAll).toHaveBeenCalledWith(
+        'user-1',
+        'DONE',
+        'employee',
+      );
     });
 
     it('should forward admin role to service as well', () => {
@@ -61,7 +67,11 @@ describe('TasksController', () => {
       const filter = {} as any;
       (tasksService.findAll as jest.Mock).mockReturnValue([]);
       controller.findAll(req, filter);
-      expect(tasksService.findAll).toHaveBeenCalledWith('user-1', undefined, 'admin');
+      expect(tasksService.findAll).toHaveBeenCalledWith(
+        'user-1',
+        undefined,
+        'admin',
+      );
     });
   });
 
@@ -70,7 +80,11 @@ describe('TasksController', () => {
       const req: any = { user: { sub: 'user-1', role: 'employee' } };
       (tasksService.findOne as jest.Mock) = jest.fn().mockReturnValue('task');
       const result = controller.findOne('123', req);
-      expect(tasksService.findOne).toHaveBeenCalledWith('123', 'user-1', 'employee');
+      expect(tasksService.findOne).toHaveBeenCalledWith(
+        '123',
+        'user-1',
+        'employee',
+      );
       expect(result).toEqual('task');
     });
   });
@@ -81,7 +95,12 @@ describe('TasksController', () => {
       const dto = { title: 'bar' } as any;
       (tasksService.update as jest.Mock) = jest.fn().mockReturnValue('updated');
       const result = controller.update('123', dto, req);
-      expect(tasksService.update).toHaveBeenCalledWith('123', dto, 'user-1', 'employee');
+      expect(tasksService.update).toHaveBeenCalledWith(
+        '123',
+        dto,
+        'user-1',
+        'employee',
+      );
       expect(result).toEqual('updated');
     });
   });
@@ -89,9 +108,15 @@ describe('TasksController', () => {
   describe('remove', () => {
     it('should return deletion message', async () => {
       const req: any = { user: { sub: 'user-1', role: 'employee' } };
-      (tasksService.remove as jest.Mock) = jest.fn().mockResolvedValue(undefined);
+      (tasksService.remove as jest.Mock) = jest
+        .fn()
+        .mockResolvedValue(undefined);
       const result = await controller.remove('task-1', req);
-      expect(tasksService.remove).toHaveBeenCalledWith('task-1', 'user-1', 'employee');
+      expect(tasksService.remove).toHaveBeenCalledWith(
+        'task-1',
+        'user-1',
+        'employee',
+      );
       expect(result).toEqual({ message: 'Task deleted' });
     });
   });

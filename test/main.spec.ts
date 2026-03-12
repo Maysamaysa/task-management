@@ -21,11 +21,21 @@ jest.mock('@nestjs/swagger', () => ({
     setup: jest.fn(),
   },
   DocumentBuilder: jest.fn().mockReturnValue({
-    setTitle() { return this; },
-    setDescription() { return this; },
-    setVersion() { return this; },
-    addBearerAuth() { return this; },
-    build() { return {}; },
+    setTitle() {
+      return this;
+    },
+    setDescription() {
+      return this;
+    },
+    setVersion() {
+      return this;
+    },
+    addBearerAuth() {
+      return this;
+    },
+    build() {
+      return {};
+    },
   }),
 }));
 

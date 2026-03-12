@@ -58,7 +58,9 @@ describe('TasksService', () => {
     it('should return all tasks belonging to the user', async () => {
       mockTaskModel.findAll.mockResolvedValue([mockTask]);
       const result = await service.findAll(USER_ID);
-      expect(mockTaskModel.findAll).toHaveBeenCalledWith({ where: { userId: USER_ID } });
+      expect(mockTaskModel.findAll).toHaveBeenCalledWith({
+        where: { userId: USER_ID },
+      });
       expect(result).toHaveLength(1);
     });
 
@@ -88,20 +90,29 @@ describe('TasksService', () => {
 
     it('should throw NotFoundException if task does not exist', async () => {
       mockTaskModel.findByPk.mockResolvedValue(null);
-      await expect(service.findOne(TASK_ID, USER_ID)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(TASK_ID, USER_ID)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw ForbiddenException if task belongs to different user', async () => {
-      mockTaskModel.findByPk.mockResolvedValue({ ...mockTask, userId: 'other-user' });
-      await expect(service.findOne(TASK_ID, USER_ID)).rejects.toThrow(ForbiddenException);
+      mockTaskModel.findByPk.mockResolvedValue({
+        ...mockTask,
+        userId: 'other-user',
+      });
+      await expect(service.findOne(TASK_ID, USER_ID)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('should allow admin to fetch any user task', async () => {
-      mockTaskModel.findByPk.mockResolvedValue({ ...mockTask, userId: 'other-user' });
+      mockTaskModel.findByPk.mockResolvedValue({
+        ...mockTask,
+        userId: 'other-user',
+      });
       const result = await service.findOne(TASK_ID, USER_ID, UserRole.ADMIN);
       expect(result).toEqual(expect.objectContaining({ userId: 'other-user' }));
     });
-
   });
 
   describe('update', () => {
@@ -114,10 +125,19 @@ describe('TasksService', () => {
     });
 
     it('should allow admin to update other users tasks', async () => {
-      const otherTask = { ...mockTask, userId: 'other-user', update: jest.fn().mockResolvedValue(undefined) };
+      const otherTask = {
+        ...mockTask,
+        userId: 'other-user',
+        update: jest.fn().mockResolvedValue(undefined),
+      };
       mockTaskModel.findByPk.mockResolvedValue(otherTask);
       const dto = { title: 'Admin change' };
-      const result = await service.update(TASK_ID, dto, USER_ID, UserRole.ADMIN);
+      const result = await service.update(
+        TASK_ID,
+        dto,
+        USER_ID,
+        UserRole.ADMIN,
+      );
       expect(otherTask.update).toHaveBeenCalledWith(dto);
       expect(result).toEqual(otherTask);
     });
@@ -131,7 +151,11 @@ describe('TasksService', () => {
     });
 
     it('should allow admin to delete other users task', async () => {
-      const otherTask = { ...mockTask, userId: 'other-user', destroy: jest.fn().mockResolvedValue(undefined) };
+      const otherTask = {
+        ...mockTask,
+        userId: 'other-user',
+        destroy: jest.fn().mockResolvedValue(undefined),
+      };
       mockTaskModel.findByPk.mockResolvedValue(otherTask);
       await service.remove(TASK_ID, USER_ID, UserRole.ADMIN);
       expect(otherTask.destroy).toHaveBeenCalled();

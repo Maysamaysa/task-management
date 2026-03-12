@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseUUIDPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseUUIDPipe,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+} from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UserRole } from './entities/user.entity';
@@ -12,7 +28,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @ApiOperation({ summary: 'Register a new user' })
@@ -48,7 +64,10 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiResponse({ status: 200, description: 'User updated' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.update(id, updateUserDto);
   }
 
@@ -60,6 +79,8 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User deleted' })
   @ApiResponse({ status: 404, description: 'User not found' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.remove(id).then(() => ({ message: 'User deleted' }));
+    return this.usersService
+      .remove(id)
+      .then(() => ({ message: 'User deleted' }));
   }
 }

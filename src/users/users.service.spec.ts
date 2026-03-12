@@ -63,7 +63,10 @@ describe('UsersService', () => {
       const result = await service.create(dto);
       expect(bcrypt.hash).toHaveBeenCalledWith('Str0ng@Pass', 10);
       expect(mockUserModel.create).toHaveBeenCalledWith(
-        expect.objectContaining({ password: 'hashedPassword', role: 'employee' }),
+        expect.objectContaining({
+          password: 'hashedPassword',
+          role: 'employee',
+        }),
       );
 
       const expected: any = { ...mockUser };
@@ -92,7 +95,11 @@ describe('UsersService', () => {
         lastName: 'Builder',
         role: 'admin',
       } as any;
-      mockUserModel.create.mockResolvedValue({ ...mockUser, role: 'employee', toJSON: () => ({ ...mockUser, role: 'employee' }) });
+      mockUserModel.create.mockResolvedValue({
+        ...mockUser,
+        role: 'employee',
+        toJSON: () => ({ ...mockUser, role: 'employee' }),
+      });
       const result = await service.create(dto);
       expect(mockUserModel.create).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'employee' }),
@@ -121,7 +128,9 @@ describe('UsersService', () => {
 
     it('should throw NotFoundException when user does not exist', async () => {
       mockUserModel.findByPk.mockResolvedValue(null);
-      await expect(service.findOne('bad-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('bad-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -144,7 +153,12 @@ describe('UsersService', () => {
 
   describe('update', () => {
     it('should update and return user', async () => {
-      const userInstance = { ...mockUser, toJSON: function () { return { ...this }; } };
+      const userInstance = {
+        ...mockUser,
+        toJSON: function () {
+          return { ...this };
+        },
+      };
       mockUserModel.findByPk.mockResolvedValue(userInstance);
       const dto = { firstName: 'Janet' };
       const result = await service.update('uuid-001', dto);
@@ -152,7 +166,13 @@ describe('UsersService', () => {
     });
 
     it('should hash new password when updating', async () => {
-      const userInstance = { ...mockUser, update: jest.fn().mockResolvedValue(mockUser), toJSON: function () { return { ...this }; } };
+      const userInstance = {
+        ...mockUser,
+        update: jest.fn().mockResolvedValue(mockUser),
+        toJSON: function () {
+          return { ...this };
+        },
+      };
       mockUserModel.findByPk.mockResolvedValue(userInstance);
       await service.update('uuid-001', { password: 'NewPass1@' });
       expect(bcrypt.hash).toHaveBeenCalledWith('NewPass1@', 10);
@@ -161,7 +181,10 @@ describe('UsersService', () => {
 
   describe('remove', () => {
     it('should delete the user', async () => {
-      const userInstance = { ...mockUser, destroy: jest.fn().mockResolvedValue(undefined) };
+      const userInstance = {
+        ...mockUser,
+        destroy: jest.fn().mockResolvedValue(undefined),
+      };
       mockUserModel.findByPk.mockResolvedValue(userInstance);
       await service.remove('uuid-001');
       expect(userInstance.destroy).toHaveBeenCalled();

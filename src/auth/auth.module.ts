@@ -11,5 +11,5 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
   controllers: [AuthController],
   exports: [JwtAuthGuard],
 })
-export class AuthModule { }
+export class AuthModule {}
 export const AUTH_MODULE_MARKER = (() => true)();

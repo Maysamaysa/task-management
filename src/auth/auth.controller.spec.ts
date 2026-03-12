@@ -18,7 +18,10 @@ describe('AuthController', () => {
       providers: [
         { provide: AuthService, useValue: authService },
         { provide: UsersService, useValue: usersService },
-        { provide: JwtService, useValue: { signAsync: jest.fn(), verifyAsync: jest.fn() } },
+        {
+          provide: JwtService,
+          useValue: { signAsync: jest.fn(), verifyAsync: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -42,7 +45,10 @@ describe('AuthController', () => {
   describe('signIn', () => {
     it('should call authService.signIn with body data', async () => {
       const body = { email: 'x', password: 'y' } as any;
-      authService.signIn.mockResolvedValue({ accessToken: 'at', refreshToken: 'rt' });
+      authService.signIn.mockResolvedValue({
+        accessToken: 'at',
+        refreshToken: 'rt',
+      });
       const result = await controller.signIn(body);
       expect(authService.signIn).toHaveBeenCalledWith('x', 'y');
       expect(result).toEqual({ accessToken: 'at', refreshToken: 'rt' });

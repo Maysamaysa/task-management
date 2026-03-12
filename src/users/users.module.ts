@@ -11,4 +11,5 @@ import { User } from './entities/user.entity';
   providers: [UsersService],
   exports: [UsersService],
 })
-export class UsersModule { }export const USERS_MODULE_MARKER = (() => true)();
+export class UsersModule {}
+export const USERS_MODULE_MARKER = (() => true)();

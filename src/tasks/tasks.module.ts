@@ -10,4 +10,5 @@ import { Task } from './entities/task.entity';
   controllers: [TasksController],
   providers: [TasksService],
 })
-export class TasksModule { }export const TASKS_MODULE_MARKER = (() => true)();
+export class TasksModule {}
+export const TASKS_MODULE_MARKER = (() => true)();

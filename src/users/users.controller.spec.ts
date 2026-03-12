@@ -26,10 +26,22 @@ describe('UsersController', () => {
   });
 
   it('should have admin role metadata on protected methods', () => {
-    const rolesAll = Reflect.getMetadata('roles', UsersController.prototype.findAll);
-    const rolesOne = Reflect.getMetadata('roles', UsersController.prototype.findOne);
-    const rolesUpdate = Reflect.getMetadata('roles', UsersController.prototype.update);
-    const rolesRemove = Reflect.getMetadata('roles', UsersController.prototype.remove);
+    const rolesAll = Reflect.getMetadata(
+      'roles',
+      UsersController.prototype.findAll,
+    );
+    const rolesOne = Reflect.getMetadata(
+      'roles',
+      UsersController.prototype.findOne,
+    );
+    const rolesUpdate = Reflect.getMetadata(
+      'roles',
+      UsersController.prototype.update,
+    );
+    const rolesRemove = Reflect.getMetadata(
+      'roles',
+      UsersController.prototype.remove,
+    );
     expect(rolesAll).toEqual(['admin']);
     expect(rolesOne).toEqual(['admin']);
     expect(rolesUpdate).toEqual(['admin']);
